@@ -24,10 +24,12 @@ Camera::Camera( float zvalue, float planedist, float width, float height, unsign
 Vector Camera::generateRay( unsigned int x, unsigned int y) const
 {
 	Vector ray = Position();
-	ray = ray * planedist;
-	ray.normalize();
-	ray += Vector(x * (width / widthInPixel) / 2, y * (width / widthInPixel) / 2, 0);
-	return ray;
+	float leftBorder = - width * 0.5f;
+	float topBorder = height * 0.5f;
+	float widthPerPixel = width / widthInPixel;
+	float heightPerPixel = height / heightInPixel;
+	ray += Vector( leftBorder + x * widthPerPixel,topBorder + y * heightPerPixel, planedist);
+	return ray.normalize();
 }
 
 Vector Camera::Position() const
@@ -43,12 +45,19 @@ SimpleRayTracer::SimpleRayTracer(unsigned int MaxDepth)
 
 void SimpleRayTracer::traceScene( const Scene& SceneModel, RGBImage& Image)
 {
-	int widthInPixel = 640;
-	int heightInPixel = 480;
+	int widthInPixel = Image.width();
+	int heightInPixel = Image.height();
 	Camera camera(8, 1, 1, 0.75f, widthInPixel, heightInPixel);
 	for (int y = 0; y < heightInPixel; y++) {
 		for (int x = 0; x < widthInPixel; x++) {
-			trace(SceneModel, camera.Position(), camera.generateRay(x,y), MaxDepth);
+			//1. Setze Farbe F für Pixel (x,y) auf Schwarz;
+			Color color;
+			Image.setPixelColor(x, y, color);
+			//2. Berechne Strahl s von Augpunkt zu Pixel;
+			Vector s = camera.generateRay(x, y);
+			//3. F = Raytracing(s);
+			color += trace(SceneModel, camera.Position(), s, MaxDepth);
+			
 		}
 	}
 }
@@ -64,11 +73,12 @@ Color SimpleRayTracer::trace( const Scene& SceneModel, const Vector& o, const Ve
 	Triangle triangle;
 	Triangle closestTriangle;
 	float closestDistance = FLT_MAX;
+	//4. Berechne ersten Auftreffpunkt p Strahls s auf der Objektoberfläche;
 	for (int i = 0; i < SceneModel.getTriangleCount(); i++) {
 		triangle = SceneModel.getTriangle(i);
 		float s = -1;
 		if (o.triangleIntersection(d, triangle.A, triangle.B, triangle.C, s)) {
-			if (s < FLT_MAX) {
+			if (s < closestDistance && s >= 0) {
 				closestTriangle = triangle;
 				closestDistance = s;
 			}

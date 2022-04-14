@@ -3,9 +3,9 @@
 
 Color::Color()
 {
-	R = 1.0f;
-	G = 1.0f;
-	B = 1.0f;
+	R = 0.0f;
+	G = 0.0f;
+	B = 0.0f;
 }
 
 Color::Color( float r, float g, float b)
