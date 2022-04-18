@@ -1,6 +1,9 @@
 #include "rgbimage.h"
 #include "color.h"
 #include "assert.h"
+#include <fstream>
+
+using namespace std;
 
 RGBImage::RGBImage( unsigned int Width, unsigned int Height)
 {
@@ -36,8 +39,8 @@ unsigned int RGBImage::height() const
 
 unsigned char RGBImage::convertColorChannel( float v)
 {
-	if (v > 1.0f) return 1.0f;
-	if (v < 0.0f) return 0.0f;
+	if (v > 1.0f) v =  1.0f;
+	if (v < 0.0f) v =  0.0f;
 	return v * 255.0f;
 }
 
@@ -51,11 +54,11 @@ bool RGBImage::saveToDisk( const char* Filename)
 		std::cerr << "Datei konnte nicht geoeffnet werden" << std::endl;
 		return false;
 	}
-	char* bfTypeChars = "BM";
-	uint16_t abfType = (bfTypeChars[1] << 8) + bfTypeChars[0];
-	uint16_t bfType[2] = { 'B','M' };
-	fwrite(&abfType, 1, 2, file);
-	uint32_t bfSize[1] = { 800 * 600 * 3 + 54 };
+	uint8_t B = 'B';
+	fwrite(&B, 1, 1, file);
+	uint8_t M = 'M';
+	fwrite(&M, 1, 1, file);
+	uint32_t bfSize[] = { m_Height * m_Width * 3 + 54 };
 	fwrite(bfSize, 4, 1, file);
 	uint32_t bfReserved[1] = { 0 };
 	fwrite(bfReserved, 4, 1, file);
@@ -94,6 +97,7 @@ bool RGBImage::saveToDisk( const char* Filename)
 			fwrite(&g, 1, 1, file);
 			fwrite(&r, 1, 1, file);
 		}
+
 	}
 	if (fclose(file) != 0)
 	{

@@ -89,18 +89,18 @@ Vector Vector::reflection( const Vector& normal) const
 	return reflectionV;
 }
 
-float triangleSurface(Vector a, Vector b, Vector c) 
+float triangleSurface(Vector a, Vector b, Vector c)
 {
-	return (b - a).cross(c - a).length() / 2.0f;
+	return ((b - a).cross(c - a).length()) / 2.0f;
 }
 
-bool Vector::triangleIntersection( const Vector& d, const Vector& a, const Vector& b, const Vector& c, float& s) const
+bool Vector::triangleIntersection(const Vector& d, const Vector& a, const Vector& b, const Vector& c, float& s) const
 {
 	Vector normaleEbene = (b - a).cross(c - a);
-	normaleEbene = normaleEbene.normalize();
+	normaleEbene.normalize();
 	float ebeneD = a.dot(normaleEbene);
 	s = (ebeneD - normaleEbene.dot(*this)) / normaleEbene.dot(d);
 	if (s < 0) return false;
 	Vector p = *this + d * s;
-	return triangleSurface(a,b,c) + EPSILON >= triangleSurface(a,b,p) +  triangleSurface(a,c,p) + triangleSurface(b,c,p);
+	return triangleSurface(a, b, c) + EPSILON >= triangleSurface(a, b, p) + triangleSurface(a, c, p) + triangleSurface(b, c, p);
 }

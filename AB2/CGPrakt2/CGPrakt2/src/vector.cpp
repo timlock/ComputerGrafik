@@ -85,22 +85,24 @@ float Vector::lengthSquared() const
 Vector Vector::reflection( const Vector& normal) const
 {
 	Vector reflectionV = *this - normal * (2.0f * dot(normal));
-	//Vector reflectionV = normal * dot(normal) *  2.0f - *this;
 	return reflectionV;
 }
 
 float triangleSurface(Vector a, Vector b, Vector c) 
 {
-	return (b - a).cross(c - a).length() / 2.0f;
+	return (((b - a).cross(c - a)).length()) / 2.0f;
 }
 
 bool Vector::triangleIntersection( const Vector& d, const Vector& a, const Vector& b, const Vector& c, float& s) const
 {
-	Vector normaleEbene = (b - a).cross(c - a);
-	normaleEbene = normaleEbene * (1.0f / normaleEbene.length());
+	Vector AB = b - a;
+	Vector AC = c - a;
+	Vector normaleEbene = (AB).cross(AC);
+	normaleEbene.normalize();
 	float ebeneD = a.dot(normaleEbene);
 	s = (ebeneD - normaleEbene.dot(*this)) / normaleEbene.dot(d);
-	if (s < 0) return false;
+	if (s < 0   || d.dot(normaleEbene) == 0) return false;
 	Vector p = *this + d * s;
 	return triangleSurface(a,b,c) + EPSILON >= triangleSurface(a,b,p) +  triangleSurface(a,c,p) + triangleSurface(b,c,p);
+
 }
