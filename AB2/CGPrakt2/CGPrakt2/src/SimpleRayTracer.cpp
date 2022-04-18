@@ -89,7 +89,8 @@ bool SimpleRayTracer::isIlluminated(const Vector& p, const PointLight& light, co
 	//	/*
 	Vector lightPosition = light.Position;
 	Vector lightDirection = (p - lightPosition);
-	float lightLengh = lightDirection.length();
+	float lightLength = lightDirection.length();
+	lightDirection;
 	float shortestDistance = FLT_MAX;
 	for (unsigned int j = 0; j < SceneModel.getTriangleCount(); j++) {
 		Triangle triangle = SceneModel.getTriangle(j);
@@ -99,11 +100,15 @@ bool SimpleRayTracer::isIlluminated(const Vector& p, const PointLight& light, co
 			shortestDistance = s;
 		}
 	}
-	if (shortestDistance > lightDirection.length()) {
+	if (shortestDistance > lightLength) {
 		return false;
 	}
-	beleuchtet++;
 	return true;
+	/*	if (lightPosition.triangleIntersection(lightDirection, triangle.A, triangle.B, triangle.C, s) && s > -EPSILON && s < 1 - EPSILON) {
+			return false;
+		}
+	}
+	return true;*/
 }
 
 Color SimpleRayTracer::trace(const Scene& SceneModel, const Vector& o, const Vector& d, unsigned int depth)
@@ -124,13 +129,13 @@ Color SimpleRayTracer::trace(const Scene& SceneModel, const Vector& o, const Vec
 	Vector normale = closestTriangle.calcNormal(p);
 	for (unsigned int i = 0; i < SceneModel.getLightCount(); i++) {
 		PointLight light = SceneModel.getLight(i);
-		if (isIlluminated(p, light, SceneModel)) {
+		if (isIlluminatedBy(p, light, SceneModel)) {
 			//5.1. Wenn JA: F = Berechne_Lokales_Beleuchtungsmodell(...)
 			color += localIllumination(p, o, normale, SceneModel.getLight(i), *(closestTriangle.pMtrl));
-			if (depth == MaxDepth) {
-				color += closestTriangle.pMtrl->getAmbientCoeff(p);
-			}
 		}
+	}
+	if (depth == MaxDepth) {
+		color += closestTriangle.pMtrl->getAmbientCoeff(p);
 	}
 	//6. Berechne Reflexionsstrahl r von s im Punkt p;
 	Vector r = d.reflection(normale);
@@ -151,3 +156,135 @@ bool SimpleRayTracer::isIlluminatedBy(const Vector& p, const PointLight& light, 
 	}
 	return true;
 }
+/*
+#include "SimpleRayTracer.h"
+#include "rgbimage.h"
+#include <stdio.h>
+#include <math.h>
+
+#define EPSILON 1e-6
+
+Camera::Camera(float zvalue, float planedist, float width, float height, unsigned int widthInPixel, unsigned int heightInPixel)
+{
+	this->zvalue = zvalue;
+	this->planedist = planedist;
+	this->width = width;
+	this->height = height;
+	this->widthInPixel = widthInPixel;
+	this->heightInPixel = heightInPixel;
+}
+
+Vector Camera::generateRay(unsigned int x, unsigned int y) const
+{
+	float xPixelPosition = (float)x * (width / (float)widthInPixel) - (width * 0.5f);
+	float yPixelPosition = -(float)y * (height / (float)heightInPixel) + (height * 0.5f);
+	return Vector(xPixelPosition, yPixelPosition, planedist).normalize();
+}
+
+Vector Camera::Position() const
+{
+	return Vector(0, 0, zvalue);
+}
+
+SimpleRayTracer::SimpleRayTracer(unsigned int MaxDepth)
+{
+	this->MaxDepth = MaxDepth;
+}
+
+
+void SimpleRayTracer::traceScene(const Scene& SceneModel, RGBImage& Image, bool debug)
+{
+	Camera camera = Camera(-8, 1, 1, 0.75f, Image.width(), Image.height());
+	for (int y = 0; y < Image.height(); y++) {
+		for (int x = 0; x < Image.width(); x++) {
+			Image.setPixelColor(x, y, trace(SceneModel, camera.Position(), camera.generateRay(x, y), MaxDepth));
+		}
+		if (y % 10 == 0) {
+			cout << "*";
+		}
+	}
+}
+
+Color SimpleRayTracer::localIllumination(const Vector& Surface, const Vector& Eye, const Vector& N, const PointLight& Light, const Material& Mtrl)
+{
+	Color I = Light.Intensity;
+	Color kd = Mtrl.getDiffuseCoeff(Surface);
+	Color ks = Mtrl.getSpecularCoeff(Surface);
+
+	Vector L = (Light.Position - Surface).normalize();
+	Vector E = (Eye - Surface).normalize();
+	Vector R = ((N * N.dot(L)) * 2 - L).normalize();
+
+	Color diffuseComponent = I * kd * fmax(0.0f, N.dot(L));
+	Color specularComponent = I * ks * fmax(0.0f, E.dot(R));
+
+	return diffuseComponent + specularComponent;
+}
+
+Color SimpleRayTracer::trace(const Scene& SceneModel, const Vector& o, const Vector& d, unsigned int depth)
+{
+	// 4. Berechne ersten Auftreffpunkt p des Strahls s auf der Objektoberfläche;
+	Triangle triangle;
+	float s = -1;
+
+	for (int triangleNo = 0; triangleNo < SceneModel.getTriangleCount(); triangleNo++) {
+		Triangle currentTriangle = SceneModel.getTriangle(triangleNo);
+		float currentS = -1;
+
+		if (o.triangleIntersection(d, currentTriangle.A, currentTriangle.B, currentTriangle.C, currentS) && currentS > 0 && (currentS < s || s < 0)) {
+			triangle = currentTriangle;
+			s = currentS;
+		}
+	}
+
+	Color F = Color();
+
+	// 5. Prüfe, ob von Punkt p Sichtverbindung zur Lichtquelle besteht :
+	if (s < 0) {
+		return F;
+	}
+	Vector p = o + d * s;
+
+	if (depth == MaxDepth) {
+		F += triangle.pMtrl->getAmbientCoeff(p);
+	}
+
+	for (int lightNo = 0; lightNo < SceneModel.getLightCount(); lightNo++) {
+		PointLight light = SceneModel.getLight(lightNo);
+		// 5.1.Wenn JA : F = Berechne_Lokales_Beleuchtungsmodell(...)
+		if (isIlluminatedBy(p, light, SceneModel)) {
+			F += localIllumination(p, o, triangle.calcNormal(p), light, *triangle.pMtrl);
+		}
+	}
+
+	if (depth > 0) {
+		// 6. Berechne Reflexionsstrahl r von s im Punkt p;
+		Vector n = triangle.calcNormal(p);
+		Vector r = d.reflection(n);
+		// 7. F = F + Raytracing(r) * Reflexionskoeffizient;
+		depth--;
+		return F + trace(SceneModel, p, r, depth) * triangle.pMtrl->getReflectivity(p);
+	}
+
+
+	// TODO Zusatzaufgabe!
+	// 8. Berechne Transmissionsstrahl t von s im Punkt p;
+	// 9. F = F + Raytracing(t) * Transmissionskoeffizient;
+
+	// 10. Return F;
+	return F;
+}
+
+bool SimpleRayTracer::isIlluminatedBy(const Vector& p, const PointLight& light, const Scene& SceneModel){
+
+	for (unsigned int i = 0; i < SceneModel.getTriangleCount(); i++) {
+		Vector q = light.Position;
+		Vector e = p - q;
+		Triangle triangle = SceneModel.getTriangle(i);
+		float s = -1;
+		if (q.triangleIntersection(e, triangle.A, triangle.B, triangle.C, s) && s > -EPSILON && s < 1 - EPSILON) {
+			return false;
+		}
+	}
+	return true;
+}*/

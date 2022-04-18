@@ -5,7 +5,7 @@
 
 
 int main(int argc, const char * argv[]) {
-    unsigned int detail = 20;
+    unsigned int detail = 5;
     bool debug = false;
     if (detail > 1) {
         debug = true;
