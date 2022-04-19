@@ -90,7 +90,6 @@ bool SimpleRayTracer::isIlluminated(const Vector& p, const PointLight& light, co
 	//Mit unterstützung von Linus Kurze geschrieben
 	Vector lightPosition = light.Position;
 	Vector lightDirection = (p - lightPosition);
-	float shortestDistance = FLT_MAX;
 	for (unsigned int j = 0; j < SceneModel.getTriangleCount(); j++) {
 		Triangle triangle = SceneModel.getTriangle(j);
 		float s = -1.0f;
