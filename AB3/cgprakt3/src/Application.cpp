@@ -60,15 +60,15 @@ Application::Application(GLFWwindow* pWin) : pWindow(pWin), Cam(pWin)
     trans.translation(0, 1.0f, 0);
     pModel->transform(trans);
     Models.push_back( pModel );*/
-    
+    /*
     // Exercise 1: LineBoxModel
-    
+    //pModel = new TriangleBoxModel(4, 4, 4);
     pModel = new LineBoxModel(2,3,4);
     pConstShader = new ConstantShader();
     pConstShader->color(Color(0,1,0));
     pModel->shader(pConstShader, true);
     Models.push_back(pModel);
-    
+    */
     
     // Exercise 2: TriangleBoxModel
     /*
@@ -80,16 +80,16 @@ Application::Application(GLFWwindow* pWin) : pWindow(pWin), Cam(pWin)
     pPhongShader->diffuseTexture(Texture::LoadShared(ASSET_DIRECTORY "smiley.png"));
     pModel->shader(pPhongShader, true);
     Models.push_back( pModel );
-    */
     
+    */
     // Exercise 3: Model
-    /*
+    
     pModel = new Model(ASSET_DIRECTORY "lizard.dae");
     pPhongShader = new PhongShader();
     pModel->shader(pPhongShader, true);
     // add to render list
     Models.push_back( pModel );
-    */
+    
     
 }
 void Application::start()
@@ -118,6 +118,21 @@ void Application::draw()
     
     // 3. check once per frame for opengl errors
     GLenum Error = glGetError();
+
+    {
+        std::string error;
+        switch (Error)
+        {
+        case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
+        case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
+        case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
+        case GL_STACK_OVERFLOW:                error = "STACK_OVERFLOW"; break;
+        case GL_STACK_UNDERFLOW:               error = "STACK_UNDERFLOW"; break;
+        case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
+        case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+        }
+        std::cout << error << std::endl;
+    }
     assert(Error==0);
 }
 void Application::end()
