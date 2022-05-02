@@ -63,9 +63,15 @@ bool Model::load(const char* ModelFile, bool FitSize)
 void Model::loadMeshes(const aiScene* pScene, bool FitSize)
 {
 	calcBoundingBox(pScene, BoundingBox);
-	pMeshes = new Mesh[pScene->mNumMeshes];
-	for (size_t i = 0; i < pScene->mNumMeshes; i++) {
-		Mesh pMesh;
+	if (FitSize) {
+		Matrix matrix;
+		matrix.scale(5);
+		transform(matrix);
+	}
+	MeshCount = pScene->mNumMeshes;
+	pMeshes = new Mesh[MeshCount];
+	for (size_t i = 0; i < MeshCount; i++) {
+		Mesh &pMesh = pMeshes[i];
 		aiMesh* aimesh = pScene->mMeshes[i];
 		pMesh.MaterialIdx = aimesh->mMaterialIndex;
 		pMesh.VB.begin();
@@ -78,26 +84,53 @@ void Model::loadMeshes(const aiScene* pScene, bool FitSize)
 				aiVector3D& texture = aimesh->mTextureCoords[0][v];
 				pMesh.VB.addTexcoord0(texture.x, -texture.y);//assim hat den Bild Ursprung unten links, anstatt oben links
 			}
-			aiVector3D& pos = aimesh->mVertices[v];
-
+			if (aimesh->HasPositions()) {
+				aiVector3D& pos = aimesh->mVertices[v];
+				pMesh.VB.addVertex(pos.x, pos.y, pos.z);
+			}
 		}
 		pMesh.VB.end();
 		pMesh.IB.begin();
-
+		for (size_t f = 0; f < aimesh->mNumFaces; f++) {
+			aiFace& aiface = aimesh->mFaces[f];
+			if (aimesh->mNumFaces < 3) continue;
+			for (size_t j = 0; j < aiface.mNumIndices; j++) {
+				pMesh.IB.addIndex(aiface.mIndices[j]);
+			}
+		}
+		pMesh.IB.end();
 	}
-
-
 }
 void Model::loadMaterials(const aiScene* pScene)
 {
-	// TODO: Add your code (Exercise 3)
+	MaterialCount = pScene->mNumMaterials;
+	pMaterials = new Material[MaterialCount];
+	for (size_t i = 0; i < MaterialCount; i++) {
+		Material material;
+		aiMaterial* aimaterials = pScene->mMaterials[i];
+		aiColor3D color;
+		aimaterials->Get(AI_MATKEY_COLOR_AMBIENT, color);
+		material.AmbColor = Color(color.r, color.g, color.b);
+		aimaterials->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+		material.DiffColor = Color(color.r, color.g, color.b);
+		aimaterials->Get(AI_MATKEY_COLOR_SPECULAR, color);
+		material.SpecColor = Color(color.r, color.g, color.b);
+
+		aiString tmp;
+		aimaterials->GetTexture(aiTextureType_DIFFUSE, 0, &tmp);
+		string fullPath = Path + tmp.C_Str();
+		material.DiffTex = Texture().LoadShared(fullPath.c_str());
+		pMaterials[i] = material;
+	}
 }
 void Model::calcBoundingBox(const aiScene* pScene, AABB& Box)
 {
-	float minX, float minY, float minZ;
-	minX = minY = minZ = FLT_MIN;
-	float maxX, float maxY, float maxZ;
-	maxX = maxY = maxZ = FLT_MAX;
+	float minX = FLT_MIN;
+	float minY = FLT_MIN;
+	float minZ = FLT_MIN;
+	float maxX = FLT_MAX;
+	float maxY = FLT_MAX;
+	float maxZ = FLT_MAX;
 	for (size_t i = 0; i < pScene->mNumMeshes; i++) {
 		for (size_t j = 0; j < pScene->mMeshes[i]->mNumVertices; j++) {
 			aiVector3D& vertice = pScene->mMeshes[i]->mVertices[j];
