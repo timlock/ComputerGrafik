@@ -61,17 +61,17 @@ bool Model::load(const char* ModelFile, bool FitSize)
 }
 
 void Model::loadMeshes(const aiScene* pScene, bool FitSize)
-{
-	calcBoundingBox(pScene, BoundingBox);
+{	
 	if (FitSize) {
 		Matrix matrix;
 		matrix.scale(5);
 		transform(matrix);
 	}
+	calcBoundingBox(pScene, BoundingBox);
 	MeshCount = pScene->mNumMeshes;
 	pMeshes = new Mesh[MeshCount];
 	for (size_t i = 0; i < MeshCount; i++) {
-		Mesh &pMesh = pMeshes[i];
+		Mesh& pMesh = pMeshes[i];
 		aiMesh* aimesh = pScene->mMeshes[i];
 		pMesh.MaterialIdx = aimesh->mMaterialIndex;
 		pMesh.VB.begin();
@@ -82,18 +82,15 @@ void Model::loadMeshes(const aiScene* pScene, bool FitSize)
 			}
 			if (aimesh->HasTextureCoords(0)) {
 				aiVector3D& texture = aimesh->mTextureCoords[0][v];
-				pMesh.VB.addTexcoord0(texture.x, -texture.y);//assim hat den Bild Ursprung unten links, anstatt oben links
+				pMesh.VB.addTexcoord0(texture.x, -texture.y);
 			}
-			if (aimesh->HasPositions()) {
-				aiVector3D& pos = aimesh->mVertices[v];
-				pMesh.VB.addVertex(pos.x, pos.y, pos.z);
-			}
+			aiVector3D& pos = aimesh->mVertices[v];
+			pMesh.VB.addVertex(pos.x, pos.y, pos.z);
 		}
 		pMesh.VB.end();
 		pMesh.IB.begin();
 		for (size_t f = 0; f < aimesh->mNumFaces; f++) {
 			aiFace& aiface = aimesh->mFaces[f];
-			if (aimesh->mNumFaces < 3) continue;
 			for (size_t j = 0; j < aiface.mNumIndices; j++) {
 				pMesh.IB.addIndex(aiface.mIndices[j]);
 			}
@@ -115,6 +112,9 @@ void Model::loadMaterials(const aiScene* pScene)
 		material.DiffColor = Color(color.r, color.g, color.b);
 		aimaterials->Get(AI_MATKEY_COLOR_SPECULAR, color);
 		material.SpecColor = Color(color.r, color.g, color.b);
+		float exp;
+		aimaterials->Get(AI_MATKEY_SHININESS, exp);
+		material.SpecExp = exp;
 
 		aiString tmp;
 		aimaterials->GetTexture(aiTextureType_DIFFUSE, 0, &tmp);
