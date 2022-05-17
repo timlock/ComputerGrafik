@@ -40,7 +40,6 @@ protected:
     Tank* pTank;
     Model* pTankTop;
     Model* pTankBot;
-    high_resolution_clock::time_point lastFrameTime;
     float time;
 };
 

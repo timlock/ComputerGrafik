@@ -29,7 +29,7 @@ protected:
     float time;
     float forwardBackward;
     float leftRight;
-    Matrix pos;
+    float drehWinkel;
 };
 
 #endif /* Tank_hpp */
