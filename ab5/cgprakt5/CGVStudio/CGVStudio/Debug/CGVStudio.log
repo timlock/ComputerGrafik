@@ -1,0 +1,28 @@
+﻿  Application.cpp
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\Application.cpp(87,21): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\Application.cpp(88,21): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
+  Terrain.cpp
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\Terrain.cpp(48,20): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\Terrain.cpp(49,21): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\Terrain.cpp(56,11): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\Terrain.cpp(60,10): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\Terrain.cpp(63,10): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\Terrain.cpp(72,19): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\Terrain.cpp(76,10): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\Terrain.cpp(76,35): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\Terrain.cpp(79,10): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\Terrain.cpp(92,10): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\Terrain.cpp(92,36): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\Terrain.cpp(97,19): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+  TerrainShader.cpp
+  Texture.cpp
+  main.cpp
+  rgbimage.cpp
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\rgbimage.cpp(45,11): warning C4244: "return": Konvertierung von "float" in "unsigned char", möglicher Datenverlust
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\rgbimage.cpp(70,25): warning C4838: Konvertierung von "unsigned int" zu "int32_t" erfordert eine einschränkende Konvertierung
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\rgbimage.cpp(72,26): warning C4838: Konvertierung von "unsigned int" zu "int32_t" erfordert eine einschränkende Konvertierung
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\rgbimage.cpp(91,21): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\rgbimage.cpp(122,20): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\rgbimage.cpp(123,21): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+  Code wird generiert...
+  CGVStudio.vcxproj -> C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\CGVStudio\Debug\CGVStudio.exe

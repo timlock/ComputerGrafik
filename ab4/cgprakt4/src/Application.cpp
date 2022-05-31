@@ -124,11 +124,11 @@ void Application::update(float deltaTime)
 	pTank->aim(ray);
 	pTank->steer(up - down, left - right);
 
-	if (oldPos.X != d.X || oldPos.Y != d.Y) {
+	/*if (oldPos.X != d.X || oldPos.Y != d.Y) {
 		system("CLS");
 		cout << d.X << "\t" << d.Y << "\t" << d.Z << "\t" << ray.X << "\t" << ray.Y << "\t" << ray.Z << endl;
 		oldPos = d;
-	}
+	}*/
 	pTank->update(deltaTime);
 	Cam.update();
 }

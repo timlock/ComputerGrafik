@@ -1,0 +1,9 @@
+﻿  Application.cpp
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\Application.cpp(86,21): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
+C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\src\Application.cpp(87,21): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
+  Code wird generiert.
+  3 of 715 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    2 functions had inline decision re-evaluated but remain unchanged
+  Codegenerierung ist abgeschlossen.
+  CGVStudio.vcxproj -> C:\Users\tim-l\Documents\Uni\Informatik\Semester4\ComputerGrafik\ab5\cgprakt5\CGVStudio\Release\CGVStudio.exe
