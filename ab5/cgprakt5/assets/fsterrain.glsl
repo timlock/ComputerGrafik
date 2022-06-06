@@ -13,7 +13,8 @@ uniform vec3 Scaling;
 
 in vec3 Position;
 in vec3 Normal;
-in vec2 Texcoord;
+in vec2 Texcoord0;
+in vec2 Texcoord1;
 out vec4 FragColor;
 
 float sat( in float a)
@@ -36,6 +37,11 @@ void main()
     
     // Exercise 3
     // TODO: Add texture blending code here..
-    
-    FragColor = vec4(((DiffuseComponent + AmbientColor) + SpecularComponent),1);
+    //int k = 100;
+	vec4 grass = texture(DetailTex[0], Texcoord1);
+	vec4 stone = texture(DetailTex[1], Texcoord1);
+	vec4 texelMixeture = texture(MixTex, Texcoord0);
+	vec4 reflectColor = vec4(((DiffuseComponent + AmbientColor) + SpecularComponent),1);
+	vec4 texFinal = mix(grass, stone , texelMixeture);
+    FragColor = texFinal * reflectColor;
 }

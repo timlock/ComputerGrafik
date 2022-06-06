@@ -74,19 +74,22 @@ void Application::start()
 
 void Application::update(float dtime)
 {
-	bool buttonDown = glfwGetKey(pWindow, GLFW_KEY_S);
-	if (buttonDown) {
+	if (glfwGetKey(pWindow, GLFW_KEY_S)) {
 		double xPos, yPos;
 		glfwGetCursorPos(pWindow, &xPos, &yPos);
-		int width, height;
-		glfwGetWindowSize(pWindow, &width, &height);
-		xPos = 2 * (xPos / width) - 1;
-		yPos = -(2 * (yPos / height) - 1);
 		Vector tSize = pTerrain->size();
-		tSize.X = tSize.X + 10 * xPos;
-		tSize.Y = tSize.Y + 10 * yPos;
+		if (xPos < this->oldCurserX)
+			tSize.X -=  2;
+		if (xPos > this->oldCurserX)
+			tSize.X += 2;
+		if (yPos > this->oldCurserY)
+			tSize.Y -= 2;
+		if (yPos < this->oldCurserY)
+			tSize.Y += 2;
+		this->oldCurserX = xPos;
+		this->oldCurserY = yPos;
 		pTerrain->size(tSize);
-		//cout << pTerrain->size().X << " " << pTerrain->size().Y << " " << pTerrain->size().Z << endl;
+		cout << pTerrain->size().X << " " << pTerrain->size().Y << " " << pTerrain->size().Z << endl;
 	}
 	Cam.update();
 }
@@ -102,7 +105,7 @@ void Application::draw()
 		(*it)->draw(Cam);
 	}
 
-	 //3. check once per frame for opengl errors
+	//3. check once per frame for opengl errors
 	GLenum Error = glGetError();
 	assert(Error == 0);
 }

@@ -34,6 +34,8 @@ protected:
     ModelList Models;
     GLFWwindow* pWindow;
     Terrain* pTerrain;
+    double oldCurserX = 0.0;
+    double oldCurserY = 0.0;
 };
 
 #endif /* Application_hpp */
