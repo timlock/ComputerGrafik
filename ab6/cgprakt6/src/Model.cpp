@@ -16,13 +16,14 @@ Model::Model() : pMeshes(NULL), MeshCount(0), pMaterials(NULL), MaterialCount(0)
 }
 Model::Model(const char* ModelFile, bool FitSize) : pMeshes(NULL), MeshCount(0), pMaterials(NULL), MaterialCount(0)
 {
-	bool ret = load(ModelFile);
+	bool ret = load(ModelFile, FitSize);
 	if (!ret)
 		throw std::exception();
 }
 Model::~Model()
 {
-	// TODO: Add your code (Exercise 3)
+	delete[] pMeshes;
+	delete[] pMaterials;
 	deleteNodes(&RootNode);
 }
 
@@ -61,79 +62,77 @@ bool Model::load(const char* ModelFile, bool FitSize)
 }
 
 void Model::loadMeshes(const aiScene* pScene, bool FitSize)
-{	
+{
+	calcBoundingBox(pScene, BoundingBox);
+
 	if (FitSize) {
 		Matrix matrix;
-		matrix.scale(1);
+		matrix.scale(5);
 		transform(matrix);
 	}
-	calcBoundingBox(pScene, BoundingBox);
+
 	MeshCount = pScene->mNumMeshes;
 	pMeshes = new Mesh[MeshCount];
-	for (size_t i = 0; i < MeshCount; i++) {
-		Mesh& pMesh = pMeshes[i];
-		aiMesh* aimesh = pScene->mMeshes[i];
-		pMesh.MaterialIdx = aimesh->mMaterialIndex;
-		pMesh.VB.begin();
-		for (size_t v = 0; v < aimesh->mNumVertices; v++) {
-			if (aimesh->HasNormals()) {
-				aiVector3D& normal = aimesh->mNormals[v];
-				pMesh.VB.addNormal(normal.x, normal.y, normal.z);
+
+	for (unsigned int meshNumber = 0; meshNumber < MeshCount; meshNumber++) {
+		pMeshes[meshNumber].MaterialIdx = pScene->mMeshes[meshNumber]->mMaterialIndex;
+		pMeshes[meshNumber].VB.begin();
+		for (unsigned int vertixNumber = 0; vertixNumber < pScene->mMeshes[meshNumber]->mNumVertices; vertixNumber++) {
+			if (pScene->mMeshes[meshNumber]->HasNormals()) {
+				aiVector3D& normal = pScene->mMeshes[meshNumber]->mNormals[vertixNumber];
+				pMeshes[meshNumber].VB.addNormal(normal.x, normal.y, normal.z);
 			}
-			if (aimesh->HasTextureCoords(0)) {
-				aiVector3D& texture = aimesh->mTextureCoords[0][v];
-				pMesh.VB.addTexcoord0(texture.x, -texture.y);
+
+			if (pScene->mMeshes[meshNumber]->HasTextureCoords(0)) {
+				aiVector3D& texture = pScene->mMeshes[meshNumber]->mTextureCoords[0][vertixNumber];
+				pMeshes[meshNumber].VB.addTexcoord0(texture.x, -texture.y);
 			}
-			aiVector3D& pos = aimesh->mVertices[v];
-			pMesh.VB.addVertex(pos.x, pos.y, pos.z);
+
+			aiVector3D& vertex = pScene->mMeshes[meshNumber]->mVertices[vertixNumber];
+			pMeshes[meshNumber].VB.addVertex(vertex.x, vertex.y, vertex.z);
+
 		}
-		pMesh.VB.end();
-		pMesh.IB.begin();
-		for (size_t f = 0; f < aimesh->mNumFaces; f++) {
-			aiFace& aiface = aimesh->mFaces[f];
-			for (size_t j = 0; j < aiface.mNumIndices; j++) {
-				pMesh.IB.addIndex(aiface.mIndices[j]);
+		pMeshes[meshNumber].VB.end();
+
+		pMeshes[meshNumber].IB.begin();
+		for (unsigned int faceNumber = 0; faceNumber < pScene->mMeshes[meshNumber]->mNumFaces; faceNumber++) {
+			for (unsigned int indexNumber = 0; indexNumber < pScene->mMeshes[meshNumber]->mFaces[faceNumber].mNumIndices; indexNumber++) {
+				pMeshes[meshNumber].IB.addIndex(pScene->mMeshes[meshNumber]->mFaces[faceNumber].mIndices[indexNumber]);
 			}
 		}
-		pMesh.IB.end();
+		pMeshes[meshNumber].IB.end();
 	}
 }
+
 void Model::loadMaterials(const aiScene* pScene)
 {
 	MaterialCount = pScene->mNumMaterials;
 	pMaterials = new Material[MaterialCount];
-	for (size_t i = 0; i < MaterialCount; i++) {
-		Material material;
-		aiMaterial* aimaterials = pScene->mMaterials[i];
-		aiColor3D color;
-		aimaterials->Get(AI_MATKEY_COLOR_AMBIENT, color);
-		material.AmbColor = Color(color.r, color.g, color.b);
-		aimaterials->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-		material.DiffColor = Color(color.r, color.g, color.b);
-		aimaterials->Get(AI_MATKEY_COLOR_SPECULAR, color);
-		material.SpecColor = Color(color.r, color.g, color.b);
-		float exp;
-		aimaterials->Get(AI_MATKEY_SHININESS, exp);
-		material.SpecExp = exp;
 
-		aiString tmp;
-		aimaterials->GetTexture(aiTextureType_DIFFUSE, 0, &tmp);
-		string fullPath = Path + tmp.C_Str();
-		material.DiffTex = Texture().LoadShared(fullPath.c_str());
-		pMaterials[i] = material;
+	for (unsigned int materialNumber = 0; materialNumber < MaterialCount; materialNumber++) {
+		aiMaterial* aimaterial = pScene->mMaterials[materialNumber];
+		aiColor4D color;
+		aiGetMaterialColor(aimaterial, AI_MATKEY_COLOR_AMBIENT, &color);
+		pMaterials[materialNumber].AmbColor = Color(color.r, color.g, color.b);
+		aiGetMaterialColor(aimaterial, AI_MATKEY_COLOR_DIFFUSE, &color);
+		pMaterials[materialNumber].DiffColor = Color(color.r, color.g, color.b);
+		aiGetMaterialColor(aimaterial, AI_MATKEY_COLOR_SPECULAR, &color);
+		pMaterials[materialNumber].SpecColor = Color(color.r, color.g, color.b);
+
+		aiString aiS;
+		aiGetMaterialTexture(aimaterial, aiTextureType_DIFFUSE, 0, &aiS);
+		pMaterials[materialNumber].DiffTex = Texture().LoadShared((Path + aiS.C_Str()).c_str());
 	}
 }
+
 void Model::calcBoundingBox(const aiScene* pScene, AABB& Box)
 {
-	float minX = FLT_MIN;
-	float minY = FLT_MIN;
-	float minZ = FLT_MIN;
-	float maxX = FLT_MAX;
-	float maxY = FLT_MAX;
-	float maxZ = FLT_MAX;
-	for (size_t i = 0; i < pScene->mNumMeshes; i++) {
-		for (size_t j = 0; j < pScene->mMeshes[i]->mNumVertices; j++) {
-			aiVector3D& vertice = pScene->mMeshes[i]->mVertices[j];
+	float minX = FLT_MIN, minY = FLT_MIN, minZ = FLT_MIN,
+		maxX = FLT_MAX, maxY = FLT_MAX, maxZ = FLT_MAX;
+
+	for (unsigned int meshNumber = 0; meshNumber < pScene->mNumMeshes; meshNumber++) {
+		for (unsigned int vertixNumber = 0; vertixNumber < pScene->mMeshes[meshNumber]->mNumVertices; vertixNumber++) {
+			aiVector3D& vertice = pScene->mMeshes[meshNumber]->mVertices[vertixNumber];
 			if (vertice.x < minX)
 				minX = vertice.x;
 			if (vertice.y < minY)

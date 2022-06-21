@@ -2,9 +2,10 @@
 #define __SimpleRayTracer__rgbimage__
 
 #include <iostream>
-#include <stdio.h>
-#include <sstream>
+#include "Matrix.h"
 class Color;
+
+using namespace std;
 
 class RGBImage
 {
@@ -16,9 +17,8 @@ public:
     bool saveToDisk( const char* Filename);
     unsigned int width() const;
     unsigned int height() const;
-    static RGBImage& SobelFilter(RGBImage& dst, const RGBImage& src, float factor);
-    int fileCount = 0;
     
+    static RGBImage& SobelFilter(RGBImage& dst, const RGBImage& src, float factor=1.0f);
     static unsigned char convertColorChannel( float f);
 protected:
     Color* m_Image;

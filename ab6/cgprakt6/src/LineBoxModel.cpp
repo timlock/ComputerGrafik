@@ -10,57 +10,50 @@
 
 LineBoxModel::LineBoxModel( float Width, float Height, float Depth )
 {
-	VB.begin();
-	//vorne unten
-	VB.addVertex(0,0,0); 
-	VB.addVertex(Width,0,0);
-	//vorne rechts
-	VB.addVertex(Width, 0, 0);
-	VB.addVertex(Width, Height, 0);
-	//vorne oben
-	VB.addVertex(Width, Height, 0);
-	VB.addVertex(0, Height, 0);
-	//vorne links
-	VB.addVertex(0, Height, 0);
-	VB.addVertex(0, 0, 0);
+    float startx = Width / 2;
+    float starty = Height / 2;
+    float startz = Depth / 2;
 
-	//hinten unten
-	VB.addVertex(0, 0, Depth);
-	VB.addVertex(Width, 0, Depth);
-	//hinten rechts
-	VB.addVertex(Width, 0, Depth);
-	VB.addVertex(Width, Height, Depth);
-	//hinten unten
-	VB.addVertex(Width, Height, Depth);
-	VB.addVertex(0, Height, Depth);
-	//hinten links
-	VB.addVertex(0, Height, Depth);
-	VB.addVertex(0, 0, Depth);
+    // 1. setup vertex buffer
+    VB.begin();
 
-	//links unten
-	VB.addVertex(0, 0, 0);
-	VB.addVertex(0, 0, Depth);
-	//links oben
-	VB.addVertex(0, Height, 0);
-	VB.addVertex(0, Height, Depth);
+    VB.addVertex(startx, -starty, -startz);
+    VB.addVertex(startx, -starty, startz);
+    VB.addVertex(-startx, -starty, -startz);
+    VB.addVertex(-startx, -starty, startz);
+    VB.addVertex(-startx, -starty, startz);
+    VB.addVertex(startx, -starty, startz);
+    VB.addVertex(-startx, -starty, -startz);
+    VB.addVertex(startx, -starty, -startz);
 
-	//rechts unten
-	VB.addVertex(Width, 0, 0);
-	VB.addVertex(Width, 0, Depth);
-	//rechts oben
-	VB.addVertex(Width, Height, 0);
-	VB.addVertex(Width, Height, Depth);
+    VB.addVertex(-startx, -starty, -startz);
+    VB.addVertex(-startx, starty, -startz);
+    VB.addVertex(startx, -starty, -startz);
+    VB.addVertex(startx, starty, -startz);
+    VB.addVertex(-startx, -starty, startz);
+    VB.addVertex(-startx, starty, startz);
+    VB.addVertex(startx, -starty, startz);
+    VB.addVertex(startx, starty, startz);
 
-	VB.end();
+    VB.addVertex(startx, starty, -startz);
+    VB.addVertex(startx, starty, startz);
+    VB.addVertex(-startx, starty, -startz);
+    VB.addVertex(-startx, starty, startz);
+    VB.addVertex(-startx, starty, startz);
+    VB.addVertex(startx, starty, startz);
+    VB.addVertex(-startx, starty, -startz);
+    VB.addVertex(startx, starty, -startz);
+    
+    VB.end();
 }
 
 void LineBoxModel::draw(const BaseCamera& Cam)
 {
     BaseModel::draw(Cam);
-  
-	VB.activate();
 
-	glDrawArrays(GL_LINES, 0, VB.vertexCount());
+    VB.activate();
 
-	VB.deactivate();
+    glDrawArrays(GL_LINES, 0, VB.vertexCount());
+
+    VB.deactivate();
 }

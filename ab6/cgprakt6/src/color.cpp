@@ -3,40 +3,54 @@
 
 Color::Color()
 {
-	R = 0.0f;
-	G = 0.0f;
-	B = 0.0f;
+	this->R = 0;
+	this->G = 0;
+	this->B = 0;
 }
 
-Color::Color( float r, float g, float b)
+Color::Color(float r, float g, float b)
 {
-	if (r > 1.0f) r = 1.0f;
-	R = r;
-	if (g > 1.0f) g = 1.0f;
-	G = g;
-	if (b > 1.0f) b = 1.0f;
-	B = b;
+	if ((r < 0 && r >= 1) || (g < 0 && g >= 1) || (b < 0 && b >= 1)) {
+		cerr << "RGB werte muessen kleiner 1 und groesser oder gleich 0 sein";
+	}
+	else {
+		this->R = r;
+		this->G = g;
+		this->B = b;
+	}
 }
 
 Color Color::operator*(const Color& c) const
 {
-	return Color(R * c.R, G * c.G, B * c.B);
+	Color ergebnis = Color();
+	ergebnis.R = this->R * c.R;
+	ergebnis.G = this->G * c.G;
+	ergebnis.B = this->B * c.B;
+	return ergebnis;
 }
 
 Color Color::operator*(const float Factor) const
 {
-	return Color(R * Factor, G * Factor, B * Factor);
+	Color ergebnis = Color();
+	ergebnis.R = this->R * Factor;
+	ergebnis.G = this->G * Factor;
+	ergebnis.B = this->B * Factor;
+	return ergebnis;
 }
 
 Color Color::operator+(const Color& c) const
 {
-	return Color(R + c.R, G + c.G, B + c.B);
+	Color ergebnis = Color();
+	ergebnis.R = this->R + c.R;
+	ergebnis.G = this->G + c.G;
+	ergebnis.B = this->B + c.B;
+	return ergebnis;
 }
 
 Color& Color::operator+=(const Color& c)
 {
-	R += c.R;
-	G += c.G;
-	B += c.B;
-	return *this; 
+	this->R += c.R;
+	this->G += c.G;
+	this->B += c.B;
+	return *this;
 }

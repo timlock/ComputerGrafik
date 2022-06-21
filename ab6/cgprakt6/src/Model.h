@@ -20,8 +20,6 @@
 #include "aabb.h"
 #include <string>
 
-using namespace std;
-
 class Model : public BaseModel
 {
 public:

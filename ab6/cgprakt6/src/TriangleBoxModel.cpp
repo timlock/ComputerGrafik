@@ -8,51 +8,124 @@
 
 #include "TriangleBoxModel.h"
 
-
 TriangleBoxModel::TriangleBoxModel(float Width, float Height, float Depth)
 {
-	/* Vector vertices[] = {
-		 Vector(0,0,0), Vector(Width,0,0), Vector(0,Height,0), Vector(Width,Height,0),
-		 Vector(0,0,Depth), Vector(Width,0,Depth), Vector(0,Height,Depth), Vector(Width,Height,Depth),
-	 };*/
+	float startx = Width * 0.5f;
+	float starty = Height * 0.5f;
+	float startz = Depth * 0.5f;
 
-	Vector vertices[] = {
-		Vector(0,0,0), Vector(0,Height,0), Vector(Width,Height,0), Vector(Width,0,0),   //vorne
-		Vector(0,0,Depth), Vector(0,Height,Depth),Vector(Width,Height,Depth), Vector(Width,0,Depth),  //hinten
-		//Vector(0,0,0), Vector(0,0,Depth), Vector(0,Height,Depth), Vector(0,Height,0), //links
-		 Vector(0,0,0), Vector(0,Height,0), Vector(0,Height,Depth), Vector(0,0,Depth), //links
-		Vector(Width,0,0), Vector(Width,Height,0), Vector(Width,Height,Depth), Vector(Width,0,Depth), //rechts
-		Vector(0,0,0), Vector(Width,0,0), Vector(Width,0,Depth), Vector(0,0,Depth), //unten
-		Vector(0,Height,0), Vector(0,Height,Depth), Vector(Width,Height,Depth), Vector(Width,Height,0) //oben
-	};
-
-	unsigned short indices[] = {
-	0,1,2,  0,2,3, //vorne
-	6,5,4,  7,6,4, //hinten
-	//8,9,11, 11,9,10, //links
-	8,11,9, 9,11,10, //links
-	12,13,15,  13,14,15, //rechts
-	17,19,16,  18,19,17, //unten
-	20,21,23,  23,21,22 //oben
-	};
+	// 1. setup vertex buffer
 	VB.begin();
-	for (int i = 0; i < 24; i += 4) {
-		VB.addNormal((vertices[i + 1] - vertices[i]).cross(vertices[i + 2] - vertices[i]).normalize());
-		VB.addTexcoord0(1, 1);
-		VB.addVertex(vertices[i]);
-		VB.addTexcoord0(1, 0);
-		VB.addVertex(vertices[i + 1]);
-		VB.addTexcoord0(0, 0);
-		VB.addVertex(vertices[i + 2]);
-		VB.addTexcoord0(0, 1);
-		VB.addVertex(vertices[i + 3]);
-	}
+
+	//oben
+	VB.addNormal(0, 1, 0);
+	VB.addTexcoord0(0, 0);
+	VB.addVertex(startx, starty, -startz); // Index 0
+	VB.addTexcoord0(0, 1);
+	VB.addVertex(startx, starty, startz); // Index 1
+	VB.addTexcoord0(1, 0);
+	VB.addVertex(-startx, starty, -startz); // Index 2
+	VB.addTexcoord0(1, 1);
+	VB.addVertex(-startx, starty, startz); // Index 3
+	//unten
+	VB.addNormal(0, -1, 0);
+	VB.addTexcoord0(0, 0);
+	VB.addVertex(-startx, -starty, startz); // Index 4
+	VB.addTexcoord0(0, 1);
+	VB.addVertex(-startx, -starty, -startz); // Index 5
+	VB.addTexcoord0(1, 0);
+	VB.addVertex(startx, -starty, startz); // Index 6
+	VB.addTexcoord0(1, 1);
+	VB.addVertex(startx, -starty, -startz); // Index 7
+	//vorne
+	VB.addNormal(0, 0, 1);
+	VB.addTexcoord0(0, 0);
+	VB.addVertex(startx, starty, startz); // Index 8
+	VB.addTexcoord0(0, 1);
+	VB.addVertex(startx, -starty, startz); // Index 9
+	VB.addTexcoord0(1, 0);
+	VB.addVertex(-startx, starty, startz); // Index 10
+	VB.addTexcoord0(1, 1);
+	VB.addVertex(-startx, -starty, startz); // Index 11
+	//hinten
+	VB.addNormal(0, 0, -1);
+	VB.addTexcoord0(0, 0);
+	VB.addVertex(startx, starty, -startz); // Index 12
+	VB.addTexcoord0(0, 1);
+	VB.addVertex(startx, -starty, -startz); // Index 13
+	VB.addTexcoord0(1, 0);
+	VB.addVertex(-startx, starty, -startz); // Index 14
+	VB.addTexcoord0(1, 1);
+	VB.addVertex(-startx, -starty, -startz); // Index 15
+	//links
+	VB.addNormal(-1, 0, 0);
+	VB.addTexcoord0(0, 0);
+	VB.addVertex(-startx, starty, startz); // Index 16
+	VB.addTexcoord0(0, 1);
+	VB.addVertex(-startx, -starty, startz); // Index 17
+	VB.addTexcoord0(1, 0);
+	VB.addVertex(-startx, starty, -startz); // Index 18
+	VB.addTexcoord0(1, 1);
+	VB.addVertex(-startx, -starty, -startz); // Index 19
+	//rechts
+	VB.addNormal(1, 0, 0);
+	VB.addTexcoord0(0, 0);
+	VB.addVertex(startx, starty, startz); // Index 20
+	VB.addTexcoord0(0, 1);
+	VB.addVertex(startx, -starty, startz); // Index 21
+	VB.addTexcoord0(1, 0);
+	VB.addVertex(startx, starty, -startz); // Index 22
+	VB.addTexcoord0(1, 1);
+	VB.addVertex(startx, -starty, -startz); // Index 23
+
 	VB.end();
 
+	// 2. setup index buffer
+
 	IB.begin();
-	for (int i = 0; i < 36; i++) {
-		IB.addIndex(indices[i]);
-	}
+	
+	//oben
+	IB.addIndex(1);
+	IB.addIndex(2);
+	IB.addIndex(3);
+	IB.addIndex(1);
+	IB.addIndex(0);
+	IB.addIndex(2);
+	//unten
+	IB.addIndex(7);
+	IB.addIndex(6);
+	IB.addIndex(5);
+	IB.addIndex(6);
+	IB.addIndex(4);
+	IB.addIndex(5);
+	//vorne
+	IB.addIndex(9);
+	IB.addIndex(10);
+	IB.addIndex(11);
+	IB.addIndex(9);
+	IB.addIndex(8);
+	IB.addIndex(10);
+	//hinten
+	IB.addIndex(15);
+	IB.addIndex(14);
+	IB.addIndex(13);
+	IB.addIndex(14);
+	IB.addIndex(12);
+	IB.addIndex(13);
+	//links
+	IB.addIndex(17);
+	IB.addIndex(18);
+	IB.addIndex(19);
+	IB.addIndex(17);
+	IB.addIndex(16);
+	IB.addIndex(18);
+	//rechts
+	IB.addIndex(23);
+	IB.addIndex(22);
+	IB.addIndex(21);
+	IB.addIndex(22);
+	IB.addIndex(20);
+	IB.addIndex(21);
 
 	IB.end();
 }
